@@ -1,0 +1,509 @@
+#myCanvas{
+    border:1px solid black;
+}
+#divBg {
+    z-index: 99;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    filter: alpha(opacity=20);
+    border-radius: 20px;
+}
+.divAdd {
+    width: 1000px;
+    height: 700px;
+    position: absolute;
+    background: #D6DFF7;
+    top: 10%;
+    left: 50%;
+    margin-left: -500px;
+    z-index: 100;
+    border-radius: 10px;
+}
+#scoreBox{
+    width: 400px;
+    height: 300px;
+    background-color: #d48d6b;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    margin-left: -200px;
+    z-index: 100;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 35px;
+    font-weight: 500;
+}
+.nameBox1 {
+    display: inline-block;
+    padding: 3px;
+    position: relative;
+    background-color: #ff7247;
+    top: 2%;
+    left: 2%;
+    text-align: center;
+    font-size: 20px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 40px;
+    border-radius: 10px;
+}
+.textBox1 {
+    display: inline-block;
+    height: 50px;
+    padding: 1px;
+    position: relative;
+    top: 2%;
+    left: 2%;
+    text-align: center;
+    font-size: 20px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 50px;
+    border-radius: 10px;
+}
+#MainTitle{
+    text-align: center;
+    font-size: 30px;
+    padding: 5px;
+}
+#GuessPlayer{
+    font-size: 20px;
+    padding: 3px;
+    position: relative;
+    left: 2%;
+}
+#PlayerGuess{
+    font-size: 20px;
+    padding: 3px;
+    position: relative;
+    left: 2%;
+}
+.ready1{
+    display: inline-block;
+    width: 80px;
+    height: 30px;
+    background-color: yellowgreen;
+    text-align: center;
+    font-size: 20px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 30px;
+    border-radius: 10px;
+}
+.ready1:hover{
+    background-color: yellow;
+}
+.ready2{
+    background-color: red;
+}
+#playerName{
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 540;
+}
+#playerArea{
+    display: block;
+    width: 1000px;
+    height: 850px;
+    position: absolute;
+    background-color: lightsalmon;
+    top: 10%;
+    left: 50%;
+    margin-left: -500px;
+    z-index: 90;
+    border-radius: 25px;
+    text-align: center;
+}
+.optionArea{
+    width: 140px;
+    height: 180px;
+    position: absolute;
+    background: #D6DFF7;
+    top: 10%;
+    left: 50%;
+    margin-left: -50px;
+}
+.option{
+    position: relative;
+    display: block;
+    background-color: goldenrod;
+    width: 120px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 10px;
+    margin: 10px;
+}
+.option:hover{
+    background-color: gold;
+    font-weight: 520;
+}
+ #optionBoxTitle{
+     height: 40px;
+     font-size: 25px;
+     font-weight: 550;
+     text-align: center;
+     line-height: 40px;
+ }
+ #showTitle{
+     height:45px;
+     font-size: 30px;
+     font-weight: 600;
+     line-height: 45px;
+     border-top-left-radius: 25px;
+     border-top-right-radius: 25px;
+     background-color: goldenrod;
+ }
+ #showDiv{
+     background-color: #ffe4c4;
+     border:0px
+ }
+ #myCanvas{
+     border: 0px;
+     background-color: #ffe4c4;
+ }
+ body{
+     background-color: burlywood;
+ }
+ .btn{
+     width:120px;
+     height: 40px;
+     text-align:center;
+     line-height:100%;
+     padding:5px;
+     font:25px Arial,sans-serif bold;
+     font-weight: 500;
+     font-style:normal;
+     text-decoration:none;
+     vertical-align:top;
+     outline:none;
+     font-size-adjust:none;
+     font-stretch:normal;
+     border-radius:10px;
+     color:#fefee9;
+     border:0.2px solid;
+     background-repeat:repeat;
+     background-size:auto;
+     background-origin:padding-box;
+     background-clip:padding-box;
+     background-color: chartreuse;
+ }
+ .btn:hover{
+     background-color: yellow;
+ }
+
+ .disable{
+     background-color: grey;
+ }
+ .disable:hover{
+    background-color: grey;
+ }
+ #readyAndUpload{
+     background-color: goldenrod;
+     padding: 5px;
+ }
+ .textBox2{
+     width: 400px;
+     height: 40px;
+     text-align: center;
+     font-size: 30px;
+     line-height: 40px;
+     font-family: "Arial Black","Microsoft YaHei";
+     border-radius: 10px;
+ }
+ #playerOrder{
+     text-align: center;
+     font-size: 30px;
+ }
+#tickRight{
+    display: inline-block;
+    margin: 10px;
+    width:50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#tickWrong{
+    display: inline-block;
+    margin: 10px;
+    width:50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.tickerImgSize{
+    width:50px;
+    height: 50px;
+}
+
+.penWeight{
+    display: inline-block;
+    width:65px;
+    height: 65px;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+}
+#thinPen{
+    background-size: 25px;
+}
+#midPen{
+    background-size: 45px;
+}
+#thickPen{
+    background-size: 65px;
+}
+#penColor{
+    display: block;
+    text-align: center;
+    line-height: 64px;
+}
+#pickColor{
+    width: 100%;
+    height: 100%;
+    /*border: 0;*/
+    /*padding: 0;*/
+    /*outline: none;*/
+    background-color: darkgoldenrod;
+    border-radius: 20px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: 20px;
+    border-radius: 20px;
+}
+#eraser{
+    display: inline-block;
+    width:90px;
+    height: 60px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90px;
+
+}
+.eraserBox{
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    height: 200px;
+    grid-auto-columns: 1fr;
+    grid-auto-rows: 1fr;
+    gap: 0px 10px;
+    grid-auto-flow: row;
+    margin: 5px;
+}
+
+.i3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+    "toolCaseBox chatAreaBox chatAreaBox";
+}
+
+.chatAreaBox {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1.2fr 0.8fr;
+    gap: 7px 0;
+    grid-auto-flow: row;
+    grid-template-areas:
+    "words words playerList"
+    "words words playerList"
+    "chatInput chatInput playerList";
+    grid-area: chatAreaBox;
+    background-color: darkgoldenrod;
+    border-radius: 20px;
+    text-align: left;
+    line-height: 100%;
+    padding: 5px;
+}
+
+.words {
+    grid-area: words;
+}
+.wordLines{
+    display: block;
+    width: 97%;
+    height: 95%;
+    padding: 5px;
+    border-radius: 15px;
+    background-color: #ffe4c4;
+}
+.wordLine_1{
+    font-size: 17px;
+    font-weight: 450;
+    color: darkslategray;
+}
+.wordLine_2{
+    font-size: 17px;
+    font-weight: 500;
+    color: #5a87fd;
+}
+.wordLine_3{
+    font-size: 17px;
+    font-weight: 500;
+    color: #f14c4c;
+}
+.wordLine_4{
+    font-size: 17px;
+    font-weight: 500;
+    color: #76a800;
+}
+#talkwords{
+    width: 82%;
+    height: 80%;
+    border-radius: 15px;
+}
+#word{
+    width: 90%;
+    max-width: 90%;
+    height: 95%;
+    max-height: 95%;
+    padding: 5px;
+    border-radius: 15px;
+    resize: none;
+}
+#sendChat{
+    width: 14%;
+    height: 90%;
+    font-size: 25px;
+}
+
+.chatInput {
+    grid-area: chatInput;
+}
+
+.playerList { grid-area: playerList; }
+
+.playerLines{
+    display: block;
+    width: 95%;
+    height: 95%;
+    padding: 5px;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: 550;
+    background-color: #ffe4c4;
+}
+.playerLine{
+    font-size: 20px;
+    font-weight: 550;
+    font-family: "Arial Black", "Microsoft YaHei", serif;
+    color: #212121;
+}
+
+.toolCaseBox {
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: left;
+    display: grid;
+    grid-template-columns: 0.8fr 0.9fr 1.3fr;
+    grid-template-rows: 0.6fr 1.4fr;
+    gap: 5px 9px;
+    grid-auto-flow: row;
+    grid-template-areas:
+    "penColor penColor eraser"
+    "thinPen midPen thickPen";
+    background-color: darkgoldenrod;
+    border-radius: 20px;
+    grid-area: toolCaseBox;
+}
+
+.penColor { grid-area: penColor; }
+
+.eraser { grid-area: eraser; }
+
+.thinPen { grid-area: thinPen; }
+
+.midPen { grid-area: midPen; }
+
+.thickPen { grid-area: thickPen; }
+
+#topBar{
+    margin: 10px;
+}
+#setting{
+    width: 120px;
+}
+#settingBox
+{
+    width: 200px;
+    height: 300px;
+    position: absolute;
+    background: #D6DFF7;
+    top: 10%;
+    left: 50%;
+    margin-left: -100px;
+    z-index: 100;
+    border-radius: 10px;
+}
+#settingBox #close{
+    position: relative;
+    left: 85%;
+    top: 1%;
+    display: block;
+    width: 26px;
+    height: 26px;
+    background-color: red;
+    text-align: center;
+    font-size: 12px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 26px;
+    border-radius: 50%;
+}
+#settingBox #form{
+    position: relative;
+    left: 50%;
+    top: 5%;
+    margin-left: -90px;
+    font-size: 20px;
+
+}
+#settingBox select{
+    width: 100px;
+    height: 25px;
+    border-radius: 10px;
+    background-color: cornflowerblue;
+    border-color: transparent;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+}
+
+
+#settingBox #submit{
+    position: relative;
+    left: 50%;
+    margin-left: -70px;
+    display: block;
+    width: 140px;
+    height: 40px;
+    background-color: yellowgreen;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 40px;
+    border-radius: 10%;
+}
+#settingBox #submit:hover{
+    background-color: yellow;
+}

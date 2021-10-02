@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+<!--    <button id="btn">开始</button>-->
+<!--    <div id="div"></div>-->
+<canvas id="colorPicker" onmousemove="showCurrentColor(event)"></canvas>
+<div id="textResult"></div>
+</body>
+<script>
+    // $("#btn").click(function (){
+    //     var tmp=0
+    //     for(var i=0;i<3000;i++){
+    //
+    //         var t=setTimeout(function (){
+    //             $("#div").text(tmp)
+    //             tmp=tmp+1;
+    //         },i*1000)
+    //     }
+    //
+    // })
+
+</script>
+<script type="text/javascript">
+    if(document.createElement("canvas")){
+        if(document.getElementById("colorPicker").getContext){
+            var can = document.getElementById("colorPicker");
+            can.setAttribute("height",300);
+            var cxt = can.getContext("2d");
+
+            var gradient = cxt.createLinearGradient(0.5,0.5,0,150);
+            gradient.addColorStop(0,'#00ff00');
+            gradient.addColorStop(1,'#ff0000');
+            cxt.fillStyle=gradient;
+            cxt.fillRect(0,0,60,200);
+
+            var ox= can.offsetLeft
+            var oy = can.offsetTop;
+            var span = document.createElement("input");
+            span.setAttribute("id","rgba");
+
+            document.getElementById("textResult").appendChild(span);
+
+        }
+    }
+
+
+    function showCurrentColor(e){
+        var x = e.clientX - 8;
+        var y = e.clientY - 29;
+        var w = 10;
+        if(document.createElement("canvas")){
+            if(document.getElementById("colorPicker").getContext){
+                var can = document.getElementById("colorPicker");
+                var cxt = can.getContext("2d");
+                var gradient = cxt.createLinearGradient(0.5,0.5,0,150);
+                var span = document.getElementById("rgba");
+                var imgDatas = cxt.getImageData(ox,oy,10,200);
+                var imgData = imgDatas.data;
+                var g = imgData[4 *(w)*(y)+(x)*4 + 1];
+                var r = imgData[4 *(w)*(y)+(x)*4];
+                var b = imgData[4 *(w)*(y)+(x)*4 + 2];
+                var a = imgData[4 *(w)*(y)+(x)*4 + 3];
+                span.value="r="+r+"  g="+ g+"  b="+b +"  a="+a;
+                document.getElementById("textResult").appendChild(span);
+
+            }
+        }
+
+
+
+
+
+    }
+
+</script>
+</html>

@@ -1,0 +1,105 @@
+#create{
+    margin: auto;
+    display: block;
+    width: 100px;
+    height: 60px;
+    background-color: yellowgreen;
+    text-align: center;
+    font-size: 20px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 60px;
+    border-radius: 20%;
+}
+#create:hover,#submit:hover{
+    background-color: yellow;
+}
+#rooms{
+    background-color: aquamarine;
+    margin: auto;
+}
+.roomStyle{
+    margin: 10px auto;
+    display: block;
+    width: 800px;
+    height: 30px;
+    text-align: center;
+    font-size: 25px;
+    font-weight: 500;
+    line-height: 30px;
+    background-color: burlywood;
+    border-radius: 10px;
+}
+#whole{
+    background-color: aqua;
+}
+#divBg
+{
+    z-index: 99;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    filter: alpha(opacity=20);
+}
+#divAdd
+{
+    width: 200px;
+    height: 300px;
+    position: absolute;
+    background: #D6DFF7;
+    top: 10%;
+    left: 50%;
+    margin-left: -100px;
+    z-index: 100;
+    border-radius: 10px;
+}
+#close{
+    position: relative;
+    left: 85%;
+    top: 1%;
+    display: block;
+    width: 26px;
+    height: 26px;
+    background-color: red;
+    text-align: center;
+    font-size: 12px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 26px;
+    border-radius: 50%;
+}
+#form{
+    position: relative;
+    left: 50%;
+    top: 5%;
+    margin-left: -90px;
+    font-size: 20px;
+
+}
+select{
+    width: 100px;
+    height: 25px;
+    border-radius: 10px;
+    background-color: cornflowerblue;
+    border-color: transparent;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+}
+
+
+#submit{
+    position: relative;
+    left: 50%;
+    margin-left: -70px;
+    display: block;
+    width: 140px;
+    height: 40px;
+    background-color: yellowgreen;
+    text-align: center;
+    font-size: 30px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 40px;
+    border-radius: 10%;
+}

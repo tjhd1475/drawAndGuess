@@ -1,0 +1,10 @@
+create table t_object(
+    id int primary key auto_increment,
+    name varchar(63),
+    theme int
+);
+
+create table t_theme(
+    id int primary key auto_increment,
+    title varchar(63)
+);

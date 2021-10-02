@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选择房间</title>
+
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="js/popPage.js"></script>
+    <link rel="stylesheet" href="css/roomList.css"/>
+    <script type="text/javascript" th:inline="javascript">
+        $(function () {
+            var url=window.location.protocol+'//'+window.location.host+'/',userName=[[${#session.getAttribute('userName')}]]
+            $.ajax({
+                url:"room",
+                type:'get',
+                dataType:"json",
+                success:function (result){
+                    $("#rooms").empty();
+                    //{"1":{"theme":null,"playNum":1},"2":{"theme":null,"playNum":1}}
+                    $.each(result,function (i,n) {
+                        var appender
+                        if(n.playNum<10){
+                            roomUrl=url+"enterRoom?roomId="+i
+                            appender='<a class="roomStyle" href='+roomUrl+'>房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10</a>'
+                        }else{
+                            appender='<div class="roomStyle">'+'房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10'+'</div>'
+                        }
+                        $("#rooms").append(appender)
+                    })
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+            $.ajax({
+                url:"theme",
+                type:'get',
+                dataType: 'json',
+                success:function (result) {
+                    $("#theme").empty()
+                    $.each(result,function (i,n){
+                        var appender='<option value="'+n.title+'">'+n.title+'</option>'
+                        $("#theme").append(appender)
+                    })
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+            // $("#create").click(function () {
+            //     window.location.href="http://localhost:8080/create?name="+[[${#session.getAttribute('userName')}]]
+            // })
+            $("#create").click(function () {
+                ShowAdd('divAdd');
+            })
+            // $("#test").click(function (){
+            //     ShowAdd();
+            // })
+            $("#close").click(function (){
+                CancelAdd('divAdd');
+            })
+            $("#submit").click(function (){
+                var theme=$("#theme").val()
+                var gsd=$("#guessDuration").val()
+                var dwd=$("#drawDuration").val()
+                if(userName==''||userName==null){
+                    alert("玩家名不能为空")
+                    return false;
+                }else if(theme==""){
+                    alert("主题不能为空")
+                    return false;
+                }else if(gsd==""){
+                    alert("猜图时间不能为空")
+                    return false;
+                }else if(dwd==""){
+                    alert("作画时间不能为空")
+                    return false
+                }else {
+                    $("#form").submit();
+                }
+            })
+        })
+    </script>
+
+</head>
+<body>
+<!--<a id="test">测试</a>-->
+<div id="divAdd">
+    <a id="close">X</a><br>
+    <form action="create" id="form">
+        选择主题:<select name="theme" id="theme">
+            <option value="食品" selected>食品</option>
+        </select><br><br>
+        作画时间:<select name="drawDuration" id="drawDuration">
+            <option value="30">30s</option>
+            <option value="60">60s</option>
+            <option value="90" selected>90s</option>
+            <option value="120">120s</option>
+            <option value="150">150s</option>
+        </select><br><br>
+        猜题时间:<select name="guessDuration" id="guessDuration">
+            <option value="10">10s</option>
+            <option value="20">20s</option>
+            <option value="30" selected>30s</option>
+            <option value="40">40s</option>
+            <option value="50">50s</option>
+        </select><br><br><br>
+    </form>
+    <a id="submit">开始游戏</a>
+</div>
+<div id="divBg"></div>
+<div id="whole">
+    <a id="create">创建房间</a>
+    <div id="rooms">
+
+    </div>
+</div>
+<script>
+    CancelAdd('divAdd');
+</script>
+</body>
+</html>

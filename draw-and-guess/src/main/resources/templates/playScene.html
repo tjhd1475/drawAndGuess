@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>场景</title>
+    <link rel="stylesheet" href="css/playScene.css"/>
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="js/popPage.js"/></script>
+    <script type="text/javascript" src="js/chat.js"/></script>
+</head>
+<body>
+
+
+<div id="topBar">
+    <a th:text="当前名字+'['+${#session.getAttribute('userName')+']'}" id="playerName">当前名字[当前玩家]</a>
+    <a name="ready" id="ready" class="ready1">准备</a>
+    <a name="setting" id="setting" class="ready1">房间设置</a>
+    <div id="settingBox">
+        <a id="close">X</a><br>
+        <form action="setRoom" id="form">
+            选择主题:<select name="theme" id="theme">
+                <option value="食品" selected>食品</option>
+            </select><br><br>
+            作画时间:<select name="drawDuration" id="drawDuration">
+                <option value="30" id="d30">30s</option>
+                <option value="60" id="d60">60s</option>
+                <option value="90" id="d90">90s</option>
+                <option value="120" id="d120">120s</option>
+                <option value="150" id="d150">150s</option>
+            </select><br><br>
+            猜题时间:<select name="guessDuration" id="guessDuration">
+                <option value="10" id="g10">10s</option>
+                <option value="20" id="g20">20s</option>
+                <option value="30" id="g30">30s</option>
+                <option value="40" id="g40">40s</option>
+                <option value="50" id="g50">50s</option>
+            </select><br><br><br>
+        </form>
+        <a id="submit">设置</a>
+    </div>
+</div>
+<div id="playerArea">
+    <div id="divAdd" class="divAdd">
+        <span id="presentPlayer" class="nameBox1">当前玩家</span>
+        <span id="text1" class="textBox1">选择的是</span>
+        <span id="guessTitle" class="nameBox1">当前画作</span>
+        <div id="MainTitle">当前作画玩家</div>
+        <div id="PlayerImg"></div>
+        <span id="GuessPlayer" class="nameBox1">当前猜测玩家</span>
+        <span id="text2" class="textBox1">猜的是</span>
+        <span id="PlayerGuess" class="nameBox1">当前玩家猜测</span>
+        <div id="scoreBox">
+            <div id="oldName"></div>
+            <img src="images/downArrow.png" >
+            <div id="finalName"></div>
+            <div id="tickers"></div>
+            <a value="right" id="tickRight" style="background-image: url('images/tickRight.png');display: none" ></a>
+            <a value="wrong" id="tickWrong" style="background-image: url('images/tickWrong.png');display: none"></a>
+        </div>
+    </div>
+    <div id="divBg"></div>
+    <div id="showTitle">你画我瞎勾⑧猜！</div>
+    <div id="showDiv" >
+        <canvas id="myCanvas" width="1000" height="480" ></canvas><!-- 此处宽度高度不能带有px单位 -->
+    </div>
+    <div id="readyAndUpload">
+        <button id="upload" disabled="disabled" class="btn disable">完成一个画</button>
+        <input type="text" id="myGuess" class="textBox2" disabled="disabled" maxlength="15">
+        <button id="guess" disabled="disabled" class="btn disable">进行一个猜</button>
+        <div id="playerOrder">瞎给你画的人--->你--->你瞎猜给的人</div>
+    </div>
+    <div id="option" class="divAdd optionArea">
+        <div id="optionBoxTitle" >选择一个</div>
+        <a id="option1" class="option">选项1</a>
+        <a id="option2" class="option">选项2</a>
+        <a id="option3" class="option">选项3</a>
+    </div>
+    <div class="container">
+        <div class="i3">
+            <div class="chatAreaBox">
+                <div class="words">
+<!--                    <textarea id="word" disabled>开始对线</textarea>-->
+                    <div id="wordLines" class="wordLines">
+                        <span class="wordLine_1">开始对线</span><br>
+                    </div>
+                </div>
+                <div class="chatInput">
+                    <input type="text" id="talkwords" class="textBox2" maxlength="30">
+                    <input type="button" value="对线" id="sendChat" class="btn" >
+                </div>
+                <div class="playerList">
+                    <div id="playerLines" class="playerLines"></div>
+                </div>
+            </div>
+            <div class="toolCaseBox">
+                <div class="penColor">
+                    <input type="color" id="pickColor" onchange="changeColor(this.value)">
+                </div>
+                <div class="eraser">
+                    <div class="eraserBox"><a id="eraser"  style="background-image: url('images/eraser.png')" onclick="eraser()"></a></div>
+                </div>
+                <div class="thinPen">
+                    <a id="thinPen" class="penWeight" style="background-image: url('images/penWeight.png')" onclick="thin()"></a>
+                </div>
+                <div class="midPen">
+                    <a id="midPen" class="penWeight" style="background-image: url('images/penWeight.png')" onclick="mid()"></a>
+                </div>
+                <div class="thickPen">
+                    <a id="thickPen" class="penWeight" style="background-image: url('images/penWeight.png')" onclick="thick()"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/drawPen.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function(){
+        var ws;
+        var readyState=0,playstate=0
+        var message='',userName=[[${#session.getAttribute('userName')}]]
+        if("WebSocket" in window ){
+            if(userName!=null&& userName!==''){
+                var url="ws:"+'//'+window.location.host+'/websocket/draw/'+userName+"/"+[[${#session.getAttribute('roomId')}]]
+                // var url="ws://localhost:8080/websocket/draw/"+userName+"/"+[[${#session.getAttribute('roomId')}]]
+                ws=new WebSocket(url)
+                ws.onopen=function (){
+                    // alert("进入房间")
+                }
+                ws.onmessage=function (event){
+                    var data=JSON.parse(event.data)
+                    // alert(data)
+                    if(data.type==0){
+                        initialProcess(data.content)
+                    }else if(data.type==1){
+                        if(data.content.state==1){
+                            playstate=1;
+                            $("#ready").addClass('disable')
+                            $("#ready").attr('disabled',true)
+                            $("#setting").addClass('disable')
+                            $("#setting").attr('disabled',true)
+                            var playerOrderText=data.content.before+'--->'+'我'+'--->'+data.content.next
+                            $("#playerOrder").text(playerOrderText)
+                            var objNames=data.content.objNames
+                            $("#option1").text(objNames[0])
+                            $("#option2").text(objNames[1])
+                            $("#option3").text(objNames[2])
+                            ShowAdd('option')
+                        }else if(data.content.state==0){
+                            playstate=0;
+                            readyState=0;
+                            $("#ready").text('准备')
+                            $("#ready").removeClass('disable')
+                            $("#ready").attr('disabled',false)
+                            $("#ready").removeClass("ready2")
+                            $("#setting").removeClass('disable')
+                            $("#setting").attr('disabled',false)
+                        }
+                    }else if(data.type==2){
+                        var img=data.content
+                        var imgArea='<img width="1000" height="480" src="'+img+'">'
+                        $("#showDiv").empty()
+                        $("#showDiv").append(imgArea)
+                        $("#myGuess").attr("disabled",false)
+                        $("#guess").attr("disabled",false)
+                        $("#guess").removeClass('disable')
+                    }else if(data.type==3){
+                        $("#showTitle").empty()
+                        $("#showTitle").append(data.content)
+                        var drawArea='<canvas id="myCanvas" width="1000" height="480"></canvas>'
+                        $("#showDiv").empty()
+                        $("#showDiv").append(drawArea)
+                        $("#upload").attr("disabled",false)
+                        $("#upload").removeClass("disable")
+                        reGet()
+                    }else if(data.type==4){
+                        var objNames=data.content
+                        $("#option1").text(objNames[0])
+                        $("#option2").text(objNames[1])
+                        $("#option3").text(objNames[2])
+                        ShowAdd('option')
+
+                    }else if(data.type==5){
+                        finishedProcess(data.content)
+                    }else if(data.type==6){
+                        addTickers(data.content)
+                    }else if(data.type==7){
+                        chat(data.content)
+                    }
+
+                }
+                ws.onclose=function (){
+                    alert("离开房间")
+                }
+                ws.onerror=function (event){
+                    console.log("websocket错误:"+event+'\n')
+                    alert("断开连接")
+                }
+            }else {
+                alert("玩家名为空，不可加入游戏")
+                $("#ready").addClass('disable')
+                $("#sendChat").addClass('disable')
+            }
+
+        }else {
+            alert("您的浏览器不支持websocket，请更新浏览器版本")
+        }
+
+        $("#ready").click(function (){
+            if(readyState==0){
+                $("#ready").text('已准备')
+                $("#ready").addClass("ready2")
+                $("#setting").addClass('disable')
+                $("#setting").attr('disabled',true)
+                message="{\"type\":\"1\",\"content\":\"1\"}"
+                ws.send(message)
+                readyState=1
+            }else if(readyState==1&&playstate==0){
+                $("#ready").text('准备')
+                $("#ready").removeClass("ready2")
+                $("#setting").removeClass('disable')
+                $("#setting").attr('disabled',false)
+                message="{\"type\":\"1\",\"content\":\"0\"}"
+                ws.send(message)
+                readyState=0
+            }
+        })
+
+        $("#setting").click(function () {
+            $.ajax({
+                url:"theme",
+                type:'get',
+                dataType: 'json',
+                success:function (result) {
+                    $("#settingBox #theme").empty()
+                    $.each(result,function (i,n){
+                        var appender=''
+                        if(n.title==theme)
+                            appender='<option value="'+n.title+'" selected>'+n.title+'</option>'
+                        else
+                            appender='<option value="'+n.title+'">'+n.title+'</option>'
+                        $("#theme").append(appender)
+                    })
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+            ShowAdd('settingBox');
+        })
+
+        $("#upload").click(function (){
+            var image=upload()
+            message="{\"type\":\"2\",\"content\":\""+image+"\"}"
+            ws.send(message)
+            clear()
+            $("#showTitle").text('')
+            $("#upload").attr('disabled',true)
+            $("#myCanvas").attr('disabled',true)
+            $("#upload").addClass("disable")
+        })
+
+        $("#guess").click(function () {
+            var guessText=$("#myGuess").val()
+            message="{\"type\":\"3\",\"content\":\""+guessText+"\"}"
+            ws.send(message)
+            $("#myGuess").val("")
+            $("#myGuess").attr('disabled',true)
+            $("#guess").attr('disabled',true)
+            $("#guess").addClass("disable")
+        })
+
+        $("#sendChat").click(function () {
+            sendChat(userName)
+        })
+
+        $("#talkwords").bind("keypress",function (e) {
+            if(e.which===13)
+                sendChat(userName)
+        })
+
+        $("#option1").click(function () {
+            var objName=$("#option1").text()
+            message="{\"type\":\"4\",\"content\":\""+objName+"\"}"
+            ws.send(message)
+            reGet()
+            CancelAdd('option')
+            $("#showTitle").text(objName)
+            $("#upload").removeClass("disable")
+            $("#upload").attr('disabled',false)
+        })
+        $("#option2").click(function () {
+            var objName=$("#option2").text()
+            message="{\"type\":\"4\",\"content\":\""+objName+"\"}"
+            ws.send(message)
+            reGet()
+            CancelAdd('option')
+            $("#showTitle").text(objName)
+            $("#upload").removeClass("disable")
+            $("#upload").attr('disabled',false)
+        })
+        $("#option3").click(function () {
+            var objName=$("#option3").text()
+            message="{\"type\":\"4\",\"content\":\""+objName+"\"}"
+            ws.send(message)
+            reGet()
+            CancelAdd('option')
+            $("#showTitle").text(objName)
+            $("#upload").removeClass("disable")
+            $("#upload").attr('disabled',false)
+        })
+
+        $("#tickRight").click(function () {
+            message="{\"type\":\"5\",\"content\":\"right\"}"
+            ws.send(message)
+            $('#tickRight').css('display','none')
+            $('#tickWrong').css('display','none')
+            addTickers('right')
+        })
+        $("#tickWrong").click(function () {
+            message="{\"type\":\"5\",\"content\":\"wrong\"}"
+            ws.send(message)
+            $('#tickWrong').css('display','none')
+            $('#tickRight').css('display','none')
+            addTickers('wrong')
+        })
+        $("#close").click(function (){
+            CancelAdd('settingBox');
+        })
+        $("#settingBox #submit").click(function () {
+            var theme=$("#settingBox #theme").val()
+            var gsd=$("#settingBox #guessDuration").val()
+            var dwd=$("#settingBox #drawDuration").val()
+            if(userName==''||userName==null){
+                alert("玩家名不能为空")
+                return false;
+            }else if(theme==""){
+                alert("主题不能为空")
+                return false;
+            }else if(gsd==""){
+                alert("猜图时间不能为空")
+                return false;
+            }else if(dwd==""){
+                alert("作画时间不能为空")
+                return false
+            }else {
+                var jsonObj={
+                    "theme":theme,
+                    "drawDuration":dwd,
+                    "guessDuration":gsd
+                }
+                sendMessage("8",JSON.stringify(jsonObj))
+                // submitSetting();
+                CancelAdd('settingBox');
+            }
+        })
+
+        var theme,drawDuration,guessDuration;
+        function initialProcess(content){
+            var players=content.players,readyState=content.readyState;
+            theme=content.theme
+            drawDuration=content.drawDuration
+            guessDuration=content.guessDuration
+            var tmpD='#drawDuration #d'+drawDuration,tmpG='#guessDuration #g'+guessDuration
+            $(tmpD).attr("selected",true)
+            $(tmpG).attr("selected",true)
+            var add=''
+            for(var i=0;i<players.length&&players[i]!=null;i++){
+                if(players[i]!=userName)
+                    add+='<div class="playerLine" id="'+players[i]+'">'+players[i]+'</div>'
+            }
+            $("#playerLines").append(add)
+        }
+
+        var inter1,inter2=5000,inter3=3000,inter4=10000,i=0,j=0;
+        function finishedProcess(content) {
+            ShowAdd('divAdd');
+            var times=0
+            $.each(content,function (player,n) {
+                times+=n.imgGusBridges.length
+                var imgGusNumb=n.imgGusBridges.length
+                inter1=(imgGusNumb/2)*inter2+(imgGusNumb/2)*inter3+inter4
+                setTimeout(function () {
+                    var guess=''
+                    $("#presentPlayer").text(player)
+                    $("#guessTitle").text(n.name)
+                    var imgAndGuess=n.imgGusBridges
+                    $.each(imgAndGuess,function (index,value) {
+                        setTimeout(function () {
+                            if(value.img==true){
+                                $("#GuessPlayer").text('')
+                                $("#MainTitle").text(value.playerName)
+                                var img=value.imgOrGus
+                                var imgArea='<img width="1000" height="480" src="'+img+'">'
+                                $("#PlayerGuess").empty()
+                                $("#PlayerImg").empty()
+                                $("#PlayerImg").append(imgArea)
+                            }
+                            if(value.img==false){
+                                $("#GuessPlayer").text(value.playerName)
+                                guess=value.imgOrGus
+                                setTimeout(function () {
+                                    $("#PlayerGuess").text(guess)
+                                },inter3)
+                            }
+                        },inter2*parseInt(j/2)+inter3*parseInt(j/2))
+                        j++;
+                    })
+                    setTimeout(function () {
+                        $('#tickers').empty()
+                        ShowAdd('scoreBox')
+                        $("#oldName").text(n.name)
+                        $("#finalName").text(guess)
+                        if((n.name).toString()==guess.toString()){
+                            $('#tickRight').css('display','inline-block')
+                        }else {
+                            $('#tickWrong').css('display','inline-block')
+                            $('#tickRight').css('display','inline-block')
+                        }
+                    },inter2*parseInt(j/2)+inter3*parseInt(j/2))
+                    setTimeout(function () {
+                        CancelAdd('scoreBox')
+                    },inter2*parseInt(j/2)+inter3*parseInt(j/2)+inter4)
+                    j=0;
+                },i*inter1)
+                i++;
+            })
+            setTimeout(function () {
+                CancelAdd('divAdd')
+                restart()
+            },i*inter1)
+            i=0
+            // var time=(times/2+1)*inter2+(times/2+1)*inter3+inter4*content.length
+        }
+
+        function addTickers(content) {
+            if(content.toString()==='right'){
+                var appender='<img src="images/tickRight.png" class="tickerImgSize">'
+            }
+            if(content.toString()==='wrong') {
+                var appender = '<img src="images/tickWrong.png" class="tickerImgSize">'
+            }
+            $('#tickers').append(appender)
+        }
+
+        function restart(){
+            sendMessage(6,"end")
+            // var message="{\"type\":\"6\",\"content\":\"end\"}"
+            ws.send(message)
+            var drawArea='<canvas id="myCanvas" width="1000" height="480"></canvas>'
+            $("#showDiv").empty()
+            $("#showDiv").append(drawArea)
+            $('#tickers').empty()
+            clear()
+        }
+
+        var linesNumb=1,MAXLINES=7;
+        function chat(content){//content = {talker: 'sam', chatType: 'SAYTOALL', chatContent: '123', voidChat: false}
+            var appender='';
+            if(linesNumb==MAXLINES){
+                $("#wordLines>span").get(0).remove()
+                $("#wordLines>br").get(0).remove()
+                linesNumb=MAXLINES-1;
+            }
+            if(content.chatType=='SAYTOALL'){
+                appender+='<span class="wordLine_1">'
+            }else if(content.chatType=='ENTER'){
+                appender+='<span class="wordLine_2">'
+                var player=content.chatContent.substring(0,content.chatContent.length-5).replace(/</g, '&lt;').replace(/>/g, '&gt;');//"加入了游戏"
+                var add='<div class="playerLine" id="'+player+'">'+player+'</div>'
+                $("#playerLines").append(add)
+            }else if(content.chatType=='LEAVE'){
+                appender+='<span class="wordLine_3">'
+                var player='#playerLines>#'+content.chatContent.substring(0,content.chatContent.length-3).replace(/</g, '&lt;').replace(/>/g, '&gt;');//"离开了"
+                $(player).remove()
+            }else if(content.chatType='SETTING'){
+                appender+='<span class="wordLine_4">'
+            }
+            appender+=content.talker.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            appender+=':'
+            appender+=content.chatContent.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            appender+='</span><br>'
+            $("#wordLines").append(appender)
+            linesNumb++;
+        }
+
+        function sendChat(userName){
+            var chatContent=$("#talkwords").val();
+            $("#talkwords").val("");
+            var jsonObj={
+                "type":"7",
+                "content":{"talker":
+                    userName,
+                    "chatType":"SAYTOALL",
+                    "chatContent":chatContent}
+            };
+            var mes=JSON.stringify(jsonObj)
+            ws.send(mes)
+        }
+
+
+        function sendMessage(type,content){
+            var jsonObj={
+                "type":type,
+                "content":content
+            };
+            var mes=JSON.stringify(jsonObj)
+            ws.send(mes)
+        }
+        
+        function submitSetting() {
+            $.ajax({
+                //几个参数需要注意一下
+                type: "GET",//方法类型
+                dataType: "string",//预期服务器返回的数据类型
+                url: "setRoom" ,//url
+                data: $('#form').serialize(),
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                    if (result.resultCode == 200) {
+                        console.log("SUCCESS SETTING");
+                    }
+                    ;
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            });
+        }
+
+
+        //初始化
+        CancelAdd('scoreBox');
+        CancelAdd('divAdd');
+        CancelAdd('option');
+        CancelAdd('settingBox');
+    })
+
+    // "{\"type\":\"5\",\"content\":{\"sss\":{\"name\":\"锅贴\",\"imgGusBridges\":[{\"playerName\":\"sss\",\"imgOrGus\":\"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",\"img\":true},{\"playerName\":\"tom\",\"imgOrGus\":\"w\",\"img\":true}]},\"tom\":{\"name\":\"萝卜\",\"imgGusBridges\":[{\"playerName\":\"tom\",\"imgOrGus\":\"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",\"img\":true},{\"playerName\":\"sss\",\"imgOrGus\":\"A\",\"img\":true}]}}}"
+
+</script>
+</html>
