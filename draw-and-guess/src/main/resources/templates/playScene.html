@@ -369,7 +369,10 @@
             var add=''
             for(var i=0;i<players.length&&players[i]!=null;i++){
                 if(players[i]!=userName)
-                    add+='<div class="playerLine" id="'+players[i]+'">'+players[i]+'</div>'
+                    if(readyState[i]==true)
+                        add+='<div class="playerLine" id="'+players[i]+'"><span class="id">'+players[i]+'</span><div class="readyState"><img class="readyImg" src="images/ready.png"/></div></div>'
+                    else
+                        add+='<div class="playerLine" id="'+players[i]+'"><span class="id">'+players[i]+'</span><div class="readyState"></div></div>'
             }
             $("#playerLines").append(add)
         }
@@ -422,6 +425,7 @@
                     },inter2*parseInt(j/2)+inter3*parseInt(j/2))
                     setTimeout(function () {
                         CancelAdd('scoreBox')
+                        $('#tickers').empty()
                     },inter2*parseInt(j/2)+inter3*parseInt(j/2)+inter4)
                     j=0;
                 },i*inter1)
@@ -453,6 +457,8 @@
             $("#showDiv").empty()
             $("#showDiv").append(drawArea)
             $('#tickers').empty()
+            var position='#playerLines'+'>div'+'>div'
+            $(position).html('')
             clear()
         }
 
@@ -469,14 +475,24 @@
             }else if(content.chatType=='ENTER'){
                 appender+='<span class="wordLine_2">'
                 var player=content.chatContent.substring(0,content.chatContent.length-5).replace(/</g, '&lt;').replace(/>/g, '&gt;');//"加入了游戏"
-                var add='<div class="playerLine" id="'+player+'">'+player+'</div>'
+                var add='<div class="playerLine" id="'+player+'"><span class="id">'+player+'</span><div class="readyState"></div></div>'
                 $("#playerLines").append(add)
             }else if(content.chatType=='LEAVE'){
                 appender+='<span class="wordLine_3">'
                 var player='#playerLines>#'+content.chatContent.substring(0,content.chatContent.length-3).replace(/</g, '&lt;').replace(/>/g, '&gt;');//"离开了"
                 $(player).remove()
-            }else if(content.chatType='SETTING'){
+            }else if(content.chatType=='SETTING'){
                 appender+='<span class="wordLine_4">'
+            }else if(content.chatType=='READY'){
+                var position='#playerLines>#'+content.talker+'>div'
+                var oldState=$(position).html()
+                if(content.chatContent=='ready'&&oldState==''){
+                    $(position).html('<img class="readyImg" src="images/ready.png"/>')
+                }
+                if(content.chatContent=='unready'&&oldState!=''){
+                    $(position).html('')
+                }
+                return;
             }
             appender+=content.talker.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             appender+=':'

@@ -1,11 +1,13 @@
 package com.tjhd.drawandguess.model;
 
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Room {
-    final private int SIZE=10;
+    private static final int SIZE=10;
     final private int MIN_PLAYER_NUMB=2;
     final public int roomId;
     private static int roomCode;
@@ -24,7 +26,6 @@ public class Room {
     public Room() {
         roomId=roomCode;
         roomCode+=1;
-
     }
 
     public String getTheme() {

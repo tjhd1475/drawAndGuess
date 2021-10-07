@@ -4,5 +4,6 @@ public enum ChatType {
     SAYTOALL,
     ENTER,
     LEAVE,
-    SETTING;
+    SETTING,
+    READY;
 }

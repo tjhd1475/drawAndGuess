@@ -10,59 +10,88 @@
     <script type="text/javascript" th:inline="javascript">
         $(function () {
             var url=window.location.protocol+'//'+window.location.host+'/',userName=[[${#session.getAttribute('userName')}]]
-            $.ajax({
-                url:"room",
-                type:'get',
-                dataType:"json",
-                success:function (result){
-                    $("#rooms").empty();
-                    //{"1":{"theme":null,"playNum":1},"2":{"theme":null,"playNum":1}}
-                    $.each(result,function (i,n) {
-                        var appender
-                        if(n.playNum<10){
-                            roomUrl=url+"enterRoom?roomId="+i
-                            appender='<a class="roomStyle" href='+roomUrl+'>房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10</a>'
-                        }else{
-                            appender='<div class="roomStyle">'+'房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10'+'</div>'
-                        }
-                        $("#rooms").append(appender)
-                    })
-
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert(textStatus);
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-                }
-            })
-            $.ajax({
-                url:"theme",
-                type:'get',
-                dataType: 'json',
-                success:function (result) {
-                    $("#theme").empty()
-                    $.each(result,function (i,n){
-                        var appender='<option value="'+n.title+'">'+n.title+'</option>'
-                        $("#theme").append(appender)
-                    })
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert(textStatus);
-                },
-                complete: function (XMLHttpRequest, textStatus) {
-                }
-            })
+            // $.ajax({
+            //     url:"room",
+            //     type:'get',
+            //     dataType:"json",
+            //     success:function (result){
+            //         $("#rooms").empty();
+            //         //{"1":{"theme":null,"playNum":1},"2":{"theme":null,"playNum":1}}
+            //         $.each(result,function (i,n) {
+            //             var appender
+            //             if(n.playNum<10){
+            //                 roomUrl=url+"enterRoom?roomId="+i
+            //                 appender='<a class="roomStyle" href='+roomUrl+'>房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10</a>'
+            //             }else{
+            //                 appender='<div class="roomStyle">'+'房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10'+'</div>'
+            //             }
+            //             $("#rooms").append(appender)
+            //         })
+            //
+            //     },
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //         alert(textStatus);
+            //     },
+            //     complete: function (XMLHttpRequest, textStatus) {
+            //     }
+            // })
+            // $.ajax({
+            //     url:"theme",
+            //     type:'get',
+            //     dataType: 'json',
+            //     success:function (result) {
+            //         $("#theme").empty()
+            //         $.each(result,function (i,n){
+            //             var appender='<option value="'+n.title+'">'+n.title+'</option>'
+            //             $("#theme").append(appender)
+            //         })
+            //     },
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //         alert(textStatus);
+            //     },
+            //     complete: function (XMLHttpRequest, textStatus) {
+            //     }
+            // })
             // $("#create").click(function () {
             //     window.location.href="http://localhost:8080/create?name="+[[${#session.getAttribute('userName')}]]
             // })
             $("#create").click(function () {
                 ShowAdd('divAdd');
             })
+            $("#custom").click(function () {
+                ShowAdd('customBox');
+            })
+            $("#check").click(function () {
+                window.location.href="check"
+            })
             // $("#test").click(function (){
             //     ShowAdd();
             // })
+            $("#addTheme").bind("keypress",function (e) {
+                if(e.which===13){
+                    var theme=$("#addTheme").val()
+                    $("#addTheme").val('');
+                    addTheme(theme)
+                    $("#themeTitle").text(theme)
+                    $("#addObject").attr("disabled",false)
+                }
+            })
+            $("#addTheme").bind("onclick",function () {
+                ThemeAjax()
+            })
+            $("#addObject").bind("keypress",function (e) {
+                if(e.which===13){
+                    var object=$("#addObject").val()
+                    var theme=$("#themeTitle").text()
+                    $("#addObject").val('')
+                    addObject(object,theme);
+                }
+            })
             $("#close").click(function (){
                 CancelAdd('divAdd');
+            })
+            $("#close2").click(function () {
+                CancelAdd('customBox');
             })
             $("#submit").click(function (){
                 var theme=$("#theme").val()
@@ -84,18 +113,202 @@
                     $("#form").submit();
                 }
             })
+            var objNumbInPage=20
+            $("#nextPage").click(function () {
+                var nowContent=$("#rooms").text()
+                if(nowContent!==''){
+                    start+=objNumbInPage;
+                    end+=objNumbInPage;
+                    searchObject(start,end)
+                }
+            })
+            $("#lastPage").click(function () {
+                if(start>0){
+                    start-=objNumbInPage;
+                    end-=objNumbInPage;
+                    searchObject(start,end)
+                }
+            })
+            var start=0,end=objNumbInPage
+            function RoomAjax_L(start,end) {
+                var theme=$("#theme").val()
+                if(theme!=='none'){
+                    $.ajax({
+                        url:"roomFromStoE",
+                        type:'get',
+                        dataType: 'json',
+                        data:{
+                            "start":start,
+                            "end":end
+                        },
+                        success:function (result) {
+                            $("#rooms").empty();
+                            var appender=''
+                            $.each(result,function (i,n) {
+                                if(n.playNum<10){
+                                    roomUrl=url+"enterRoom?roomId="+i
+                                    appender+='<a class="roomStyle" href='+roomUrl+'>房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10</a>'
+                                }else{
+                                    appender+='<div class="roomStyle">'+'房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10'+'</div>'
+                                }
+                            })
+                            $("#rooms").append(appender)
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(textStatus);
+                        },
+                        complete: function (XMLHttpRequest, textStatus) {
+                        }
+                    })
+                }
+            }
+            function ThemeAjax_L(){
+                $.ajax({
+                    url:"theme",
+                    type:'get',
+                    dataType: 'json',
+                    success:function (result) {
+                        var appender=''
+                        $("#theme").empty()
+                        $.each(result,function (i,n){
+                            appender+='<option value="'+n.title+'">'+n.title+'</option>'
+                        })
+                        $("#theme").append(appender)
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(textStatus);
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+            function ThemeAjax(){
+                $.ajax({
+                    url:"allTheme",
+                    type:'get',
+                    dataType: 'json',
+                    success:function (result) {
+                        var appender=''
+                        $("#typeList").empty()
+                        $.each(result,function (i,n){
+                            appender+='<option value="'+n.title+'">'+n.title+'</option>'
+                        })
+                        $("#typeList").append(appender)
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(textStatus);
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+            function RoomAjax(){
+                $.ajax({
+                    url:"room",
+                    type:'get',
+                    dataType:"json",
+                    success:function (result){
+                        $("#rooms").empty();
+                        //{"1":{"theme":null,"playNum":1},"2":{"theme":null,"playNum":1}}
+                        var appender=''
+                        $.each(result,function (i,n) {
+                            if(n.playNum<10){
+                                roomUrl=url+"enterRoom?roomId="+i
+                                appender+='<a class="roomStyle" href='+roomUrl+'>房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10</a>'
+                            }else{
+                                appender+='<div class="roomStyle">'+'房间编号:'+i+'   主题:'+n.theme+'   当前玩家数:'+n.playNum+'/10'+'</div>'
+                            }
+                        })
+                        $("#rooms").append(appender)
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(textStatus);
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+            var successAppender='<img src="images/tickRight.png" class="tickerImgSize">',failAppender='<img src="images/tickWrong.png" class="tickerImgSize">'
+            function addTheme(theme) {
+                $.ajax({
+                    url:"addTheme",
+                    type:'get',
+                    data:{"theme":theme},
+                    dataType:"json",
+                    success: function (result) {
+                        // console.log(result);//打印服务端返回的数据(调试用)
+                        // if (result.resultCode == 200) {
+                        //     console.log("SUCCESS ADD");
+                        // }
+                        // ;
+                        if(result.result===true){
+                            $("#themeState").empty();
+                            $("#themeState").append(successAppender)
+                            setTimeout(function () {
+                                $("#themeState").empty();
+                            },800)
+                        }else if(result.result===false){
+                            alert("主题格式错误")
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+            function addObject(object,theme) {
+                $.ajax({
+                    url:"addObject",
+                    type:'get',
+                    data:{
+                        "objName":object,
+                        "theme":theme,
+                    },
+                    dataType:"json",
+                    success: function (result) {
+                        // console.log(result);//打印服务端返回的数据(调试用)
+                        // if (result.resultCode == 200) {
+                        //     console.log("SUCCESS ADD");
+                        // }
+                        // ;
+                        if(result.result===true){
+                            $("#objectState").empty();
+                            $("#objectState").append(successAppender)
+                            setTimeout(function () {
+                                $("#objectState").empty();
+                            },800)
+                        }else if(result.result===false){
+                            alert("主题格式错误")
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+            function initialProcess(){
+                RoomAjax_L(start,end);
+                ThemeAjax();
+                ThemeAjax_L();
+            }
+            initialProcess();
         })
     </script>
 
 </head>
 <body>
 <!--<a id="test">测试</a>-->
-<div id="divAdd">
-    <a id="close">X</a><br>
+<div id="divAdd" class="divAdd">
+    <a id="close" class="close">X</a><br>
     <form action="create" id="form">
         选择主题:<select name="theme" id="theme">
             <option value="食品" selected>食品</option>
-        </select><br><br>
+        </select><br>
+        <span class="notice">注:题目数量大于30的主题才会显示</span><br>
         作画时间:<select name="drawDuration" id="drawDuration">
             <option value="30">30s</option>
             <option value="60">60s</option>
@@ -113,15 +326,39 @@
     </form>
     <a id="submit">开始游戏</a>
 </div>
+<div id="customBox" class="divAdd">
+    <a id="close2" class="close">X</a>
+    <div id="customArea">
+        <div id="themeTitle">
+            （请先选择一个题库）
+        </div>
+        <div id="themeBox" class="box">
+            <input type="text" id="addTheme" list="typeList" class="textBox3" maxlength="10" value="ENTER选定主题" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999"/>
+            <div class="state" id="themeState"></div>
+            <datalist id="typeList"></datalist>
+        </div>
+        <div id="objectsBox" class="box">
+            <input type="text" id="addObject" class="textBox3" disabled maxlength="15" value="ENTER向选定主题添加物品" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999"/>
+            <div class="state" id="objectState"></div>
+        </div>
+    </div>
+</div>
 <div id="divBg"></div>
 <div id="whole">
-    <a id="create">创建房间</a>
+    <div id="topBar">
+        <a id="create" class="btn">创建房间</a><a id="custom" class="btn">自定义</a><a id="check" class="btn">词库</a>
+    </div>
     <div id="rooms">
 
+    </div>
+    <div id="bottomBar">
+        <a id="lastPage" class="btn pageBtn">上一页</a>
+        <a id="nextPage" class="btn pageBtn">下一页</a>
     </div>
 </div>
 <script>
     CancelAdd('divAdd');
+    CancelAdd('customBox');
 </script>
 </body>
 </html>

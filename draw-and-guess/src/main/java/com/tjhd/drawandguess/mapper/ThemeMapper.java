@@ -22,4 +22,10 @@ public interface ThemeMapper {
     List<Theme> selectAll();
 
     List<String> selectAllName();
+
+    List<Theme> selectHasNObj(Integer amount);
+
+    Theme selectByTitle(String title);
+
+    int insertByTitle(String title);
 }

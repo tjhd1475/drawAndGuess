@@ -83,14 +83,36 @@
   </select>
   <select id="selectN_RandomByTheme" resultMap="BaseResultMap">
     select
-      t1.id,name,theme
+    t1.id,name,theme
     from
-      t_object t1 join t_theme t2
+    t_object t1 join t_theme t2
     on
-      t1.theme=t2.id
+    t1.theme=t2.id
     where
-      title=#{theme}
+    title=#{theme}
     order by rand()
-      limit #{amount_N};
+    limit #{amount_N};
   </select>
+  <select id="selectByTheme" resultMap="BaseResultMap">
+    select
+    t1.id,name,theme
+    from
+    t_object t1
+    join
+    t_theme t2
+    on
+    t1.theme=t2.id
+    where
+    title=#{theme}
+    limit
+    #{start},#{last}
+  </select>
+  <delete id="deleteByNameOnTheme" parameterType="java.lang.String">
+    delete t1 from
+    t_object t1
+    left join t_theme t2
+    on t1.theme=t2.id
+    where t1.name=#{name}
+    and t2.title=#{theme}
+  </delete>
 </mapper>

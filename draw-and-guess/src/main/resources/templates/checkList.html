@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>题库</title>
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="js/popPage.js"></script>
+    <link rel="stylesheet" href="css/roomList.css"/>
+    <link rel="stylesheet" href="css/checkList.css"/>
+</head>
+<body>
+<div id="customBox" class="divAdd">
+    <a id="close2" class="close">X</a>
+    <div id="customArea">
+        <div id="themeTitle">
+            （请先选择一个题库）
+        </div>
+        <div id="themeBox" class="box">
+            <input type="text" id="addTheme" list="typeList" class="textBox3" maxlength="10" value="ENTER选定主题" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999"/>
+            <div class="state" id="themeState"></div>
+            <datalist id="typeList"></datalist>
+        </div>
+        <div id="objectsBox" class="box">
+            <input type="text" id="addObject" class="textBox3" disabled maxlength="15" value="ENTER向选定主题添加物品" onFocus="if(value==defaultValue){value='';this.style.color='#000'}" onBlur="if(!value){value=defaultValue;this.style.color='#999'}" style="color:#999999"/>
+            <div class="state" id="objectState"></div>
+        </div>
+    </div>
+</div>
+<div id="divBg"></div>
+<div id="whole">
+    <div id="topBar">
+        <a id="custom" class="btn">自定义</a>
+        <select name="theme" id="theme" >
+            <option value="none" selected>请选择一个主题</option>
+        </select>
+        <a id="return" class="btn">返回</a>
+        <div class="notice">注:点击题目可以将该题目从指定主题中删除</div>
+    </div>
+    <div id="objects">
+
+    </div>
+    <div id="bottomBar">
+        <a id="lastPage" class="btn pageBtn">上一页</a>
+        <a id="nextPage" class="btn pageBtn">下一页</a>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        $("#custom").click(function () {
+            ShowAdd('customBox');
+        })
+        $("#return").click(function () {
+            window.location.href="roomList"
+        })
+        $("#theme").change(function () {
+            start=0
+            end=20
+            searchObject(start,end)
+        })
+        $("#addTheme").bind("keypress",function (e) {
+            if(e.which===13){
+                var theme=$("#addTheme").val()
+                $("#addTheme").val('');
+                addTheme(theme)
+                $("#themeTitle").text(theme)
+                $("#addObject").attr("disabled",false)
+            }
+        })
+        $("#addTheme").bind("onclick",function () {
+            ThemeAjax()
+        })
+        $("#addObject").bind("keypress",function (e) {
+            if(e.which===13){
+                var object=$("#addObject").val()
+                var theme=$("#themeTitle").text()
+                $("#addObject").val('')
+                addObject(object,theme);
+            }
+        })
+        $("#close2").click(function (){
+            CancelAdd('customBox');
+        })
+
+        var objNumbInPage=20
+        $("#nextPage").click(function () {
+            var nowContent=$("#objects").text()
+            if(nowContent!==''){
+                start+=objNumbInPage;
+                end+=objNumbInPage;
+                searchObject(start,end)
+            }
+        })
+        $("#lastPage").click(function () {
+            if(start>0){
+                start-=objNumbInPage;
+                end-=objNumbInPage;
+                searchObject(start,end)
+            }
+        })
+        function ThemeAjax(){
+            $.ajax({
+                url:"allTheme",
+                type:'get',
+                dataType: 'json',
+                success:function (result) {
+                    var appender=''
+                    $("#typeList").empty()
+                    $("#theme").empty()
+                    $("#theme").append('<option value="-1" selected>请选择一个主题</option>')
+                    $.each(result,function (i,n){
+                        appender+='<option value="'+n.title+'">'+n.title+'</option>'
+                    })
+                    $("#typeList").append(appender)
+                    $("#theme").append(appender)
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+        }
+        var successAppender='<img src="images/tickRight.png" class="tickerImgSize">',failAppender='<img src="images/tickWrong.png" class="tickerImgSize">'
+        function addTheme(theme) {
+            $.ajax({
+                url:"addTheme",
+                type:'get',
+                data:{"theme":theme},
+                dataType:"json",
+                success: function (result) {
+                    // console.log(result);//打印服务端返回的数据(调试用)
+                    // if (result.resultCode == 200) {
+                    //     console.log("SUCCESS ADD");
+                    // }
+                    // ;
+                    if(result.result===true){
+                        $("#themeState").empty();
+                        $("#themeState").append(successAppender)
+                        setTimeout(function () {
+                            $("#themeState").empty();
+                        },800)
+                    }else if(result.result===false){
+                        alert("主题格式错误")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+        }
+
+        function addObject(object,theme) {
+            $.ajax({
+                url:"addObject",
+                type:'get',
+                data:{
+                    "objName":object,
+                    "theme":theme,
+                },
+                dataType:"json",
+                success: function (result) {
+                    // console.log(result);//打印服务端返回的数据(调试用)
+                    // if (result.resultCode == 200) {
+                    //     console.log("SUCCESS ADD");
+                    // }
+                    // ;
+                    if(result.result===true){
+                        $("#objectState").empty();
+                        $("#objectState").append(successAppender)
+                        setTimeout(function () {
+                            $("#objectState").empty();
+                        },800)
+                    }else if(result.result===false){
+                        alert("主题格式错误")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+        }
+
+        var start=0,end=objNumbInPage
+        function searchObject(start,end) {
+            var theme=$("#theme").val()
+            if(theme!=='none'){
+                $.ajax({
+                    url:"object",
+                    type:'get',
+                    dataType: 'json',
+                    data:{
+                        "theme":theme,
+                        "start":start,
+                        "end":end
+                    },
+                    success:function (result) {
+                        $("#objects").empty()
+                        var appender='',maxCol=6,maxWordLen=5
+                        $.each(result,function (i,n) {
+                            var name=n.name
+                            appender+='<a class="object" id="'+name+'" title="'+name+'">'
+                            if(n.name.length>maxWordLen){
+                                name=n.name.substring(0,maxWordLen)
+                                name+='...'
+                            }
+                            appender+=name+'</a>'
+                            if((i+1)%maxCol===0){
+                                appender+='<br>'
+                            }
+                        })
+                        $("#objects").append(appender)
+                        $("#objects>a").click(function () {
+                            var object=$(this).attr('id')
+                            delObject(object,theme)
+                        })
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(textStatus);
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                    }
+                })
+            }
+        }
+        function delObject(object,theme) {
+            $.ajax({
+                url:"delObject",
+                type:'get',
+                data:{
+                    "objName":object,
+                    "theme":theme,
+                },
+                dataType:'json',
+                success: function (result) {
+                    if(result.result==true){
+                        var position='#'+object
+                        $(position).addClass('disable')
+                        $(position).attr("disabled",true)
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            })
+        }
+        function initialProcess(){
+            ThemeAjax();
+        }
+        initialProcess();
+        CancelAdd('customBox');
+    })
+
+</script>
+</html>

@@ -26,6 +26,20 @@ public class ThemeServiceImpl implements ThemeService {
         }
         return json;
     }
+
+    @Override
+    public String queryOverNAsJson(int amount) {
+        //SELECT id,title from t_theme t1 JOIN (SELECT t.c,theme from (SELECT COUNT(*) c,theme from t_object GROUP BY theme) t where t.c>3;) t2 on t1.id=t2.theme;
+        List<Theme> themes=themeMapper.selectHasNObj(amount);
+        String json=null;
+        try {
+            json=objectMapper.writeValueAsString(themes);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
     @Override
     public List<Theme> queryAll(){
         List<Theme> themes=themeMapper.selectAll();
@@ -35,5 +49,15 @@ public class ThemeServiceImpl implements ThemeService {
     public List<String> queryAllName(){
         List<String> names=themeMapper.selectAllName();
         return names;
+    }
+
+    @Override
+    public boolean addNew(String title) {
+        Theme oldExist=themeMapper.selectByTitle(title);
+        if(oldExist==null){
+            int res=themeMapper.insertByTitle(title);
+            return res>0;
+        }
+        return true;
     }
 }

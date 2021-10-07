@@ -7,6 +7,14 @@ public class QuestionObject {
 
     private Integer theme;
 
+    public QuestionObject(String name, Integer theme) {
+        this.name = name;
+        this.theme = theme;
+    }
+
+    public QuestionObject() {
+    }
+
     public Integer getId() {
         return id;
     }
@@ -30,4 +38,5 @@ public class QuestionObject {
     public void setTheme(Integer theme) {
         this.theme = theme;
     }
+
 }

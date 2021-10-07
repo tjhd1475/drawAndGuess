@@ -116,24 +116,24 @@
     text-align: center;
 }
 .optionArea{
-    width: 140px;
-    height: 180px;
+    width: 240px;
+    height: 220px;
     position: absolute;
     background: #D6DFF7;
     top: 10%;
     left: 50%;
-    margin-left: -50px;
+    margin-left: -100px;
 }
 .option{
     position: relative;
     display: block;
     background-color: goldenrod;
-    width: 120px;
-    height: 30px;
-    font-size: 20px;
+    width: 220px;
+    height: 45px;
+    font-size: 1vw;
     font-weight: 500;
     text-align: center;
-    line-height: 30px;
+    line-height: 45px;
     border-radius: 10px;
     margin: 10px;
 }
@@ -367,6 +367,11 @@ input[type="color"]::-webkit-color-swatch {
     font-weight: 500;
     color: #76a800;
 }
+.wordLine_5{
+    font-size: 17px;
+    font-weight: 500;
+    color: #b5da67;
+}
 #talkwords{
     width: 82%;
     height: 80%;
@@ -506,4 +511,17 @@ input[type="color"]::-webkit-color-swatch {
 }
 #settingBox #submit:hover{
     background-color: yellow;
+}
+.readyImg{
+    width: 35px;
+}
+.id{
+    display: inline-block;
+    horiz-align: left;
+    vertical-align: center;
+}
+.readyState{
+    display: inline-block;
+    horiz-align: right;
+    vertical-align: center;
 }

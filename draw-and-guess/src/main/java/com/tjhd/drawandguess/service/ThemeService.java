@@ -7,5 +7,7 @@ import java.util.List;
 public interface ThemeService {
     String queryAllAsJson();
     List<Theme> queryAll();
-    List<String> queryAllName();
+    List<String>  queryAllName();
+    boolean addNew(String title);
+    String queryOverNAsJson(int amount);
 }

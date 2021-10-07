@@ -1,6 +1,6 @@
-#create{
-    margin: auto;
-    display: block;
+.btn{
+    margin: 5px;
+    display: inline-block;
     width: 100px;
     height: 60px;
     background-color: yellowgreen;
@@ -8,10 +8,61 @@
     font-size: 20px;
     font-family: "Arial Black","Microsoft YaHei";
     line-height: 60px;
-    border-radius: 20%;
+    border-radius: 12px;
 }
-#create:hover,#submit:hover{
+.btn:hover,#submit:hover{
     background-color: yellow;
+}
+.textBox3{
+    display: inline-block;
+    width: 80%;
+    height: 40px;
+    padding: 1px;
+    position: relative;
+    top: 2%;
+    text-align: center;
+    font-size: 16px;
+    font-family: "Arial Black","Microsoft YaHei";
+    line-height: 50px;
+    border-radius: 10px;
+    vertical-align: middle
+}
+
+.state{
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    vertical-align: middle
+}
+.tickerImgSize{
+    width:40px;
+    height: 40px;
+}
+
+#customBox{
+    width: 300px;
+    height: 250px;
+    position: absolute;
+    background: #bdaa6d;
+    top: 10%;
+    left: 50%;
+    margin-left: -120px;
+}
+#customArea{
+    text-align: center;
+}
+#themeTitle{
+    height: 55px;
+    font-size: 26px;
+    background: #db7824;
+    font-weight: 600;
+    line-height: 55px;
+    text-align: center;
+    margin-top: 8px;
+}
+.box{
+    text-align: center;
+    margin: 20px 10px;
 }
 #rooms{
     background-color: aquamarine;
@@ -30,7 +81,7 @@
     border-radius: 10px;
 }
 #whole{
-    background-color: aqua;
+    background-color: #bfeaea;
 }
 #divBg
 {
@@ -43,7 +94,7 @@
     opacity: 0.5;
     filter: alpha(opacity=20);
 }
-#divAdd
+.divAdd
 {
     width: 200px;
     height: 300px;
@@ -55,9 +106,9 @@
     z-index: 100;
     border-radius: 10px;
 }
-#close{
+.close{
     position: relative;
-    left: 85%;
+    left: 86%;
     top: 1%;
     display: block;
     width: 26px;
@@ -102,4 +153,24 @@ select{
     font-family: "Arial Black","Microsoft YaHei";
     line-height: 40px;
     border-radius: 10%;
+}
+#topBar{
+    text-align: center;
+    margin: 10px;
+    background-color: #bfeaea;
+}
+#bottomBar{
+    background-color: #bfeaea;
+    text-align: center;
+}
+
+.pageBtn{
+    width: 60px;
+    height: 25px;
+    font-size: 17px;
+    line-height: 25px;
+}
+.notice{
+    font-size: 10px;
+    color: #999999;
 }

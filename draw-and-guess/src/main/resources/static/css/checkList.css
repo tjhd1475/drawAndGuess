@@ -1,0 +1,35 @@
+ #theme{
+     width: 120px;
+     height: 40px;
+     font-size: 20px;
+     border-radius: 20px;
+ }
+ #objects{
+     text-align: center;
+     background-color: #e7caa6;
+ }
+ .object{
+     display: inline-block;
+     width: 130px;
+     height: 40px;
+     font-size: 16px;
+     line-height: 40px;
+     border-radius: 20px;
+     background-color: #ce9b52;
+     margin: 4px;
+ }
+
+ .object:hover{
+     background-color: #ffcf77;
+ }
+ .disable{
+     background-color: grey;
+ }
+ .disable:hover{
+     background-color: grey;
+ }
+ .notice{
+     font-size: 10px;
+     color: #999999;
+     text-align: center;
+ }

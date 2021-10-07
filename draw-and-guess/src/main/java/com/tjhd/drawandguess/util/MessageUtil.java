@@ -113,7 +113,7 @@ public class MessageUtil {
     public static void SendChat(Map<String, DrawServerEndpoint> onlinePlayers, Room room,Chat chat){
         if(onlinePlayers==null||room==null)
             return;
-        if(chat.getChatType()==ChatType.SAYTOALL||chat.getChatType()==ChatType.ENTER||chat.getChatType()==ChatType.LEAVE||chat.getChatType()==ChatType.SETTING){
+        if(chat.getChatType()==ChatType.SAYTOALL||chat.getChatType()==ChatType.ENTER||chat.getChatType()==ChatType.LEAVE||chat.getChatType()==ChatType.SETTING||chat.getChatType()==ChatType.READY){
             if(!chat.isVoidChat()){
                 String message=MessageUtil.createMessage("7",chat);
                 String []playerList=room.getPlayers();
@@ -132,10 +132,11 @@ public class MessageUtil {
         }
     }
     public static void SendInitialMessage(Map<String, DrawServerEndpoint> onlinePlayers,Room room,String player){
-        if(room==null&&player==null&&!room.isDuplicateName(player)){
+        if(room==null||player==null){
             return;
         }
         Map<String,Object> map=new HashMap<>();
+        assert room != null;
         map.put("players",room.getPlayers());
         map.put("readyState",room.getPrepareState());
         map.put("theme",room.getTheme());

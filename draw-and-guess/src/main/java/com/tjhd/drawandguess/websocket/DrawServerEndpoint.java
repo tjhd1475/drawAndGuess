@@ -4,10 +4,11 @@ import com.tjhd.drawandguess.bean.RoomContainor;
 import com.tjhd.drawandguess.configurator.GetHttpSessionConfigurator;
 import com.tjhd.drawandguess.model.*;
 import com.tjhd.drawandguess.model.enums.ChatType;
-import com.tjhd.drawandguess.service.QustionObjectService;
+import com.tjhd.drawandguess.service.QuestionObjectService;
 import com.tjhd.drawandguess.util.MessageUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -24,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint(value = "/websocket/draw/{name}/{roomId}" ,configurator = GetHttpSessionConfigurator.class)
 public class DrawServerEndpoint {
-    private final static int choiceNum=3;
-    private static QustionObjectService qustionObjectService;
+    private static int choiceNum=3;
+    private static QuestionObjectService questionObjectService;
     @Autowired
-    public void setQustionObjectService(QustionObjectService qustionObjectService){
-        DrawServerEndpoint.qustionObjectService=qustionObjectService;
+    public void setQuestionObjectService(QuestionObjectService questionObjectService){
+        DrawServerEndpoint.questionObjectService = questionObjectService;
     }
     private static RoomContainor roomContainor;
     @Autowired
@@ -43,7 +44,7 @@ public class DrawServerEndpoint {
     public void onOpen(@PathParam("name")String name,@PathParam("roomId")String roomId,Session session,EndpointConfig config){
         if(roomId!=null){
             Room room= roomContainor.getRoom(Integer.valueOf(roomId));
-            if(room.isDuplicateName(name)&&!room.isStart()){
+            if(room.isDuplicateName(name)||room.isStart()){
                 try {
                     session.close();
                 } catch (IOException e) {
@@ -80,12 +81,14 @@ public class DrawServerEndpoint {
             }else {
                 room.setPrepareState(name,true);
             }
+            Chat chat=new Chat(name,ChatType.READY, res.getContent().equals("1")?"ready":"unready");
+            MessageUtil.SendChat(onlinePlayers,room,chat);
             if(room.IsAllPrepared()){
                 room.setStart(true);
                 Map<String,Object> infoToInclude =new HashMap<>();
                 infoToInclude.put("state","1");
                 String []playerList=room.getPlayers();
-                List<QuestionObject> questionObjects=qustionObjectService.queryN_RandomByTheme(room.getTheme(),room.playNum*choiceNum);
+                List<QuestionObject> questionObjects= questionObjectService.queryN_RandomByTheme(room.getTheme(),room.playNum*choiceNum);
                 int index=0;
                 for(String player:playerList){
                     if(player!=null){
@@ -197,8 +200,10 @@ public class DrawServerEndpoint {
     public void onClose(@PathParam("name")String name,@PathParam("roomId")String roomId,Session session){
         if (trueIn) {
             Room room=roomContainor.getRoom(Integer.valueOf(roomId));
+            System.out.println(name+" disconnected");
             room.removePlayer(name);
             if(room.playNum<=0){
+                System.out.println("close room:"+room.roomId);
                 roomContainor.removeRoom(room);
             }else {
                 roomContainor.updateRoom(room);
@@ -226,6 +231,9 @@ public class DrawServerEndpoint {
         }
     }
 
+    public void setChoiceNum(int choiceNum) {
+        this.choiceNum = choiceNum;
+    }
     public Session getSession() {
         return session;
     }

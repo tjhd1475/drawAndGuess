@@ -66,4 +66,27 @@
   <select id="selectAllName" resultType="java.lang.String">
     select title from t_theme
   </select>
+  <select id="selectByTitle" resultType="com.tjhd.drawandguess.model.Theme" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from t_theme
+    where title=#{title}
+  </select>
+  <insert id="insertByTitle" parameterType="java.lang.String">
+    insert into t_theme (title) values (#{title})
+  </insert>
+  <select id="selectHasNObj" parameterType="java.lang.Integer" resultType="com.tjhd.drawandguess.model.Theme">
+    select <include refid="Base_Column_List"/>
+    from t_theme t1
+    join (
+        SELECT t.c,theme
+        from (
+            SELECT COUNT(*) c,theme
+            from t_object
+            GROUP BY theme
+        ) t
+        where t.c>=#{amount}
+    ) t2
+    on t1.id=t2.theme;
+  </select>
 </mapper>
