@@ -68,13 +68,16 @@ function eraser(){
         document.getElementById("eraser").style.backgroundImage="url('images/pen2.png')"
         document.getElementById("eraser").style.backgroundSize="65px"
     }else {
-        pen.strokeStyle=document.getElementById("pickColor").value;
-        isPen=true;
-        document.getElementById("eraser").style.backgroundImage="url('images/eraser.png')"
-        document.getElementById("eraser").style.backgroundSize="90px"
+        pen.strokeStyle = document.getElementById("pickColor").value;
+        isPen = true;
+        document.getElementById("eraser").style.backgroundImage = "url('images/eraser.png')"
+        document.getElementById("eraser").style.backgroundSize = "90px"
     }
-
-
+}
+//设置是否是橡皮
+function setEraser(isEraser){
+    isPen=isEraser;
+    eraser();
 }
 function pos(event){//鼠标取得点
     var ex,ey;

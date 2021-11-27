@@ -90,7 +90,9 @@ public class MessageUtil {
             if(player!=null){
                 try {
                     Session nextPlayerSession=onlinePlayers.get(player).getSession();
-                    nextPlayerSession.getBasicRemote().sendText(message);
+                    synchronized (nextPlayerSession){
+                        nextPlayerSession.getBasicRemote().sendText(message);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

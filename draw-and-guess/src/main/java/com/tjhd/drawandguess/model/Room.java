@@ -1,10 +1,12 @@
 package com.tjhd.drawandguess.model;
 
 
+import com.tjhd.drawandguess.websocket.DrawServerEndpoint;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
     private static final int SIZE=10;
@@ -303,9 +305,11 @@ public class Room {
 
     public String findOriginPicker(String presentDrawer){
         String res=null;
+        int n=playerList.length;
         for(int i=0;i<playNum;i++){
-            if(presentDrawer!=null&&playerList[i].equals(presentDrawer)){
-                res=playerList[(i-round+playNum)%playNum];
+            if(playerList[i].equals(presentDrawer)){
+                if((i-round+playNum)%playNum<n)
+                    res=playerList[(i-round+playNum)%playNum];
             }
         }
         return res;

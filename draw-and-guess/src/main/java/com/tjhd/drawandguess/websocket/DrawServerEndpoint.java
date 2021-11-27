@@ -141,7 +141,9 @@ public class DrawServerEndpoint {
             }
         //得到猜测结果
         }else if(res.getType().equals("3")){
-            room.addGuess(room.findOriginPicker(name),name,res.getContent());
+            String originPicker=room.findOriginPicker(name);
+            if(originPicker!=null)
+                room.addGuess(room.findOriginPicker(name),name,res.getContent());
             room.setFinishState(name,true);
             if(room.IsAllFinished()){
                 room.CancelFinished();
@@ -186,12 +188,15 @@ public class DrawServerEndpoint {
         }else if(res.getType().equals("7")){
             Message<Chat> chat=MessageUtil.getChat(message);
             MessageUtil.SendChat(onlinePlayers,room,chat.getContent());
-        }else if(res.getType().equals("8")){
+        }else if(res.getType().equals("8")){    //更改房间设置
             RoomSettings roomSettings=MessageUtil.getRoomSettings(res.getContent());
             room.setRoom(roomSettings);
             message=roomSettings.toString();
             Chat chat=new Chat(name,ChatType.SETTING,message);
             MessageUtil.SendChat(onlinePlayers,room,chat);
+            message=MessageUtil.createMessage("8",roomSettings);
+            System.out.println(message);
+            MessageUtil.SendToAll(onlinePlayers,room,message);
         }
         roomContainor.updateRoom(room);
     }

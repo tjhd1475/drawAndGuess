@@ -15,6 +15,8 @@
     <a th:text="当前名字+'['+${#session.getAttribute('userName')+']'}" id="playerName">当前名字[当前玩家]</a>
     <a name="ready" id="ready" class="ready1">准备</a>
     <a name="setting" id="setting" class="ready1">房间设置</a>
+<!--    <a id="test" class="ready1">测试</a>-->
+<!--    <a id="test2" class="ready1">测试2</a>-->
     <div id="settingBox">
         <a id="close">X</a><br>
         <form action="setRoom" id="form">
@@ -63,12 +65,29 @@
     <div id="showDiv" >
         <canvas id="myCanvas" width="1000" height="480" ></canvas><!-- 此处宽度高度不能带有px单位 -->
     </div>
-    <div id="readyAndUpload">
-        <button id="upload" disabled="disabled" class="btn disable">完成一个画</button>
-        <input type="text" id="myGuess" class="textBox2" disabled="disabled" maxlength="15">
-        <button id="guess" disabled="disabled" class="btn disable">进行一个猜</button>
-        <div id="playerOrder">瞎给你画的人--->你--->你瞎猜给的人</div>
+    <div class="container_mid">
+        <div class="midbar_1">
+            <div id="readyAndUpload">
+                <button id="upload" disabled="disabled" class="btn disable">完成一个画</button>
+                <input type="text" id="myGuess" class="textBox2" disabled="disabled" maxlength="15">
+                <button id="guess" disabled="disabled" class="btn disable">进行一个猜</button>
+                <div id="playerOrder">瞎给你画的人--->你--->你瞎猜给的人</div>
+            </div>
+        </div>
+        <div class="midbar_2">
+            <div id="clock_area">
+                <div class="circleProgress_wrapper">
+                    <div class="wrapper right">
+                        <div class="circleProgress rightcircle" id="rightCircle"></div>
+                    </div>
+                    <div class="wrapper left">
+                        <div class="circleProgress leftcircle" id="leftCircle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <div id="option" class="divAdd optionArea">
         <div id="optionBoxTitle" >选择一个</div>
         <a id="option1" class="option">选项1</a>
@@ -118,6 +137,7 @@
     $(function(){
         var ws;
         var readyState=0,playstate=0
+        var round=0
         var message='',userName=[[${#session.getAttribute('userName')}]]
         if("WebSocket" in window ){
             if(userName!=null&& userName!==''){
@@ -133,7 +153,8 @@
                     if(data.type==0){
                         initialProcess(data.content)
                     }else if(data.type==1){
-                        if(data.content.state==1){
+                        if(data.content.state==1){  //全员准备完毕，开始选题，选择后即开始作画
+                            startCount('draw',drawDuration)
                             playstate=1;
                             $("#ready").addClass('disable')
                             $("#ready").attr('disabled',true)
@@ -146,7 +167,8 @@
                             $("#option2").text(objNames[1])
                             $("#option3").text(objNames[2])
                             ShowAdd('option')
-                        }else if(data.content.state==0){
+                        }else if(data.content.state==0){    //游戏结束，取消准备
+                            console.log('game end');
                             playstate=0;
                             readyState=0;
                             $("#ready").text('准备')
@@ -156,7 +178,7 @@
                             $("#setting").removeClass('disable')
                             $("#setting").attr('disabled',false)
                         }
-                    }else if(data.type==2){
+                    }else if(data.type==2){ //开始猜测
                         var img=data.content
                         var imgArea='<img width="1000" height="480" src="'+img+'">'
                         $("#showDiv").empty()
@@ -164,7 +186,8 @@
                         $("#myGuess").attr("disabled",false)
                         $("#guess").attr("disabled",false)
                         $("#guess").removeClass('disable')
-                    }else if(data.type==3){
+                        startCount('guess',guessDuration)
+                    }else if(data.type==3){ //开始作画
                         $("#showTitle").empty()
                         $("#showTitle").append(data.content)
                         var drawArea='<canvas id="myCanvas" width="1000" height="480"></canvas>'
@@ -173,6 +196,7 @@
                         $("#upload").attr("disabled",false)
                         $("#upload").removeClass("disable")
                         reGet()
+                        startCount('draw',drawDuration)
                     }else if(data.type==4){
                         var objNames=data.content
                         $("#option1").text(objNames[0])
@@ -186,6 +210,8 @@
                         addTickers(data.content)
                     }else if(data.type==7){
                         chat(data.content)
+                    }else if(data.type==8){
+                        setRoom(data.content)
                     }
 
                 }
@@ -251,25 +277,22 @@
             ShowAdd('settingBox');
         })
 
+        // $("#test").click(function () {
+        //     var d='animation_'+30+'s'
+        //     $('#leftCircle').addClass('animation_left '+d);
+        //     $('#rightCircle').addClass('animation_right '+d);
+        // })
+        // $("#test2").click(function () {
+        //     var d='animation_'+30+'s'
+        //     $('#leftCircle').removeClass('animation_left '+d);
+        //     $('#rightCircle').removeClass('animation_right '+d);
+        // })
         $("#upload").click(function (){
-            var image=upload()
-            message="{\"type\":\"2\",\"content\":\""+image+"\"}"
-            ws.send(message)
-            clear()
-            $("#showTitle").text('')
-            $("#upload").attr('disabled',true)
-            $("#myCanvas").attr('disabled',true)
-            $("#upload").addClass("disable")
+            uploadProcess()
         })
 
         $("#guess").click(function () {
-            var guessText=$("#myGuess").val()
-            message="{\"type\":\"3\",\"content\":\""+guessText+"\"}"
-            ws.send(message)
-            $("#myGuess").val("")
-            $("#myGuess").attr('disabled',true)
-            $("#guess").attr('disabled',true)
-            $("#guess").addClass("disable")
+            guessProcess()
         })
 
         $("#sendChat").click(function () {
@@ -380,7 +403,8 @@
         var inter1,inter2=5000,inter3=3000,inter4=10000,i=0,j=0;
         function finishedProcess(content) {
             ShowAdd('divAdd');
-            var times=0
+            clearTimeout(timer1);
+            var times=0;
             $.each(content,function (player,n) {
                 times+=n.imgGusBridges.length
                 var imgGusNumb=n.imgGusBridges.length
@@ -454,11 +478,16 @@
             // var message="{\"type\":\"6\",\"content\":\"end\"}"
             ws.send(message)
             var drawArea='<canvas id="myCanvas" width="1000" height="480"></canvas>'
+            $("#showTitle").empty()
+            $("#showTitle").append('你画我瞎勾⑧猜！')
             $("#showDiv").empty()
             $("#showDiv").append(drawArea)
             $('#tickers').empty()
             var position='#playerLines'+'>div'+'>div'
             $(position).html('')
+            setEraser(false)
+            $('#leftCircle').removeClass('animation_left '+d)
+            $('#rightCircle').removeClass('animation_right '+d)
             clear()
         }
 
@@ -481,8 +510,9 @@
                 appender+='<span class="wordLine_3">'
                 var player='#playerLines>#'+content.chatContent.substring(0,content.chatContent.length-3).replace(/</g, '&lt;').replace(/>/g, '&gt;');//"离开了"
                 $(player).remove()
-            }else if(content.chatType=='SETTING'){
+            }else if(content.chatType=='SETTING'){  //更改房间设置
                 appender+='<span class="wordLine_4">'
+
             }else if(content.chatType=='READY'){
                 var position='#playerLines>#'+content.talker+'>div'
                 var oldState=$(position).html()
@@ -516,7 +546,6 @@
             ws.send(mes)
         }
 
-
         function sendMessage(type,content){
             var jsonObj={
                 "type":type,
@@ -548,6 +577,61 @@
             });
         }
 
+        function setRoom(content) {
+            drawDuration=content.drawDuration;
+            guessDuration=content.guessDuration;
+            theme=content.theme;
+        }
+
+        //猜测和作图计时器
+        var finished=false
+        var timer1
+        var d=''
+        function startCount(kind,duration){
+            $('#leftCircle').removeClass('circleProgress leftcircle animation_left '+d)
+            $('#rightCircle').removeClass('circleProgress rightcircle animation_right '+d)
+            clearTimeout(timer1)
+            d='animation_'+duration+'s'
+            $('#leftCircle').addClass('circleProgress leftcircle animation_left '+d);
+            $('#rightCircle').addClass('circleProgress rightcircle animation_right '+d);
+            window.console.log('setTimer:'+d)
+            finished=false
+            timer1=setTimeout(function () {
+                if(!finished){
+                    if(kind==='draw'){
+                        uploadProcess()
+                    }else if(kind==='guess'){
+                        guessProcess()
+                    }
+                }
+                finished=false
+            },parseInt(duration)*1000)
+        }
+
+        //上传图片函数
+        function uploadProcess(){
+            var image=upload()
+            message="{\"type\":\"2\",\"content\":\""+image+"\"}"
+            ws.send(message)
+            clear()
+            $("#showTitle").text('')
+            $("#upload").attr('disabled',true)
+            $("#myCanvas").attr('disabled',true)
+            $("#upload").addClass("disable")
+            finished=true
+        }
+
+        //上传猜测函数
+        function guessProcess() {
+            var guessText=$("#myGuess").val()
+            message="{\"type\":\"3\",\"content\":\""+guessText+"\"}"
+            ws.send(message)
+            $("#myGuess").val("")
+            $("#myGuess").attr('disabled',true)
+            $("#guess").attr('disabled',true)
+            $("#guess").addClass("disable")
+            finished=true
+        }
 
         //初始化
         CancelAdd('scoreBox');
